@@ -65,7 +65,7 @@ data Expr
     = -- | Hex literal: @#"abcd"@
       Hex ByteString
     | -- | Integer literal: @42@
-      Int Int
+      Int Integer
     | -- | Variable reference: @proof@, @mpf.empty@
       Var String
     | -- | Record constructor: @Name { f: v }@
@@ -194,7 +194,7 @@ hex :: ByteString -> Expr
 hex = Hex
 
 -- | Integer literal.
-int :: Int -> Expr
+int :: Integer -> Expr
 int = Int
 
 -- | Variable reference.
