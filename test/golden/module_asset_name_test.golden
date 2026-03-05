@@ -1,0 +1,6 @@
+use cardano/assets.{OutputReference}
+
+test asset_name_check() {
+  asset_name(OutputReference { transaction_id: #"aabb", output_index: 0 }) == #"ccdd"
+
+}
