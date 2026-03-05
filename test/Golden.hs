@@ -81,32 +81,31 @@ main = hspec $ do
         goldenExpr "var" $
             var "mpf.empty"
 
-        goldenExpr "empty_list" $
-            list []
+        goldenExpr
+            "empty_list"
+            emptyList
 
         goldenExpr "list_of_ints" $
-            list [int 1, int 2, int 3]
+            list $ do
+                item (int 1)
+                item (int 2)
+                item (int 3)
 
         goldenExpr "record_simple" $
-            record
-                "Leaf"
-                [ ("skip", int 0)
-                , ("key", hex "\xab")
-                ]
+            record "Leaf" $ do
+                field "skip" (int 0)
+                field "key" (hex "\xab")
 
         goldenExpr "record_nested" $
-            record
-                "Fork"
-                [ ("skip", int 0)
-                ,
-                    ( "neighbor"
-                    , record
-                        "Neighbor"
-                        [ ("nibble", int 5)
-                        , ("root", hex "\xde\xad")
-                        ]
-                    )
-                ]
+            record "Fork" $ do
+                field "skip" (int 0)
+                field "neighbor" $
+                    record "Neighbor" $
+                        do
+                            field "nibble" (int 5)
+                            field
+                                "root"
+                                (hex "\xde\xad")
 
         goldenExpr "call_no_args" $
             call "mpf.empty" []
@@ -131,13 +130,16 @@ main = hspec $ do
             Let
                 "proof"
                 (Just "Proof")
-                (list [])
+                emptyList
                 (var "proof")
 
         goldenExpr "let_chain" $
             runBody $ do
                 p <-
-                    bindAs "proof" "Proof" (list [])
+                    bindAs
+                        "proof"
+                        "Proof"
+                        emptyList
                 t <-
                     bind
                         "trie"
@@ -194,20 +196,14 @@ main = hspec $ do
                         bindAs
                             "proof"
                             "Proof"
-                            ( list
-                                [ record
-                                    "Branch"
-                                    [
-                                        ( "skip"
-                                        , int 0
-                                        )
-                                    ,
-                                        ( "neighbors"
-                                        , hex
-                                            "\xaa"
-                                        )
-                                    ]
-                                ]
+                            ( list $ do
+                                item $
+                                    record "Branch" $
+                                        do
+                                            field "skip" (int 0)
+                                            field
+                                                "neighbors"
+                                                (hex "\xaa")
                             )
                     t <-
                         bind
@@ -240,7 +236,7 @@ main = hspec $ do
                         bindAs
                             "proof"
                             "Proof"
-                            (list [])
+                            emptyList
                     pure $
                         call
                             "mpf.has"
@@ -261,17 +257,13 @@ main = hspec $ do
                     pure $
                         call
                             "asset_name"
-                            [ record
-                                "OutputReference"
-                                [
-                                    ( "transaction_id"
-                                    , hex "\xaa\xbb"
-                                    )
-                                ,
-                                    ( "output_index"
-                                    , int 0
-                                    )
-                                ]
+                            [ record "OutputReference" $ do
+                                field
+                                    "transaction_id"
+                                    (hex "\xaa\xbb")
+                                field
+                                    "output_index"
+                                    (int 0)
                             ]
                             .== hex "\xcc\xdd"
 
@@ -296,7 +288,7 @@ main = hspec $ do
                         bindAs
                             "proof"
                             "Proof"
-                            (list [])
+                            emptyList
                     pure $
                         call
                             "mpf.has"

@@ -22,15 +22,25 @@ module Aiken.Codegen
     , hex
     , int
     , var
-    , record
     , call
-    , list
     , (.==)
 
       -- * Definition constructors
     , useFrom
     , useAs
     , comment
+
+      -- * ListM (element accumulator)
+    , ListM
+    , item
+    , list
+    , emptyList
+
+      -- * RecordM (field accumulator)
+    , RecordM
+    , field
+    , record
+    , emptyRecord
 
       -- * BodyM (let-binding builder)
     , BodyM
@@ -201,17 +211,9 @@ int = Int
 var :: String -> Expr
 var = Var
 
--- | Record constructor.
-record :: String -> [(String, Expr)] -> Expr
-record = Record
-
 -- | Function call.
 call :: String -> [Expr] -> Expr
 call = Call
-
--- | List literal.
-list :: [Expr] -> Expr
-list = List
 
 -- | Equality operator.
 (.==) :: Expr -> Expr -> Expr
@@ -234,6 +236,70 @@ useAs = UseAs
 -- | Comment line.
 comment :: String -> Def
 comment = Comment
+
+-- ---------------------------------------------------------
+-- ListM — element accumulator (operational)
+-- ---------------------------------------------------------
+
+-- | Instructions for accumulating list elements.
+data ListI a where
+    -- | Add an element to the list.
+    Item :: Expr -> ListI ()
+
+{- | Monad for building lists.  Each 'item'
+appends an element; 'list' collects them into
+a 'List' expression.
+-}
+type ListM = Program ListI
+
+-- | Add an element to the list.
+item :: Expr -> ListM ()
+item e = singleton (Item e)
+
+-- | Empty list literal.
+emptyList :: Expr
+emptyList = List []
+
+-- | Build a 'List' expression from elements.
+list :: ListM () -> Expr
+list = List . go
+  where
+    go :: ListM () -> [Expr]
+    go m = case view m of
+        Return () -> []
+        Item e :>>= k -> e : go (k ())
+
+-- ---------------------------------------------------------
+-- RecordM — field accumulator (operational)
+-- ---------------------------------------------------------
+
+-- | Instructions for accumulating record fields.
+data RecordI a where
+    -- | Add a field to the record.
+    Field :: String -> Expr -> RecordI ()
+
+{- | Monad for building records.  Each 'field'
+appends a field; 'runRecord' collects them into
+a 'Record' expression.
+-}
+type RecordM = Program RecordI
+
+-- | Add a field to the record.
+field :: String -> Expr -> RecordM ()
+field name val = singleton (Field name val)
+
+-- | Empty record: @Name { }@
+emptyRecord :: String -> Expr
+emptyRecord name = Record name []
+
+-- | Build a 'Record' expression from fields.
+record :: String -> RecordM () -> Expr
+record name = Record name . go
+  where
+    go :: RecordM () -> [(String, Expr)]
+    go m = case view m of
+        Return () -> []
+        Field n v :>>= k -> (n, v) : go (k ())
 
 -- ---------------------------------------------------------
 -- BodyM — let-binding builder (operational)
