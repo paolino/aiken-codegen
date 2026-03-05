@@ -1,0 +1,6 @@
+test _() {
+  let proof: Proof = []
+  let trie = mpf.insert(mpf.empty, #"ab", #"cd", proof)
+  mpf.root(trie) == #"ef"
+
+}

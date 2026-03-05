@@ -1,0 +1,9 @@
+use aiken/merkle_patricia_forestry.{Branch, Fork, Leaf, Proof}
+use aiken/merkle_patricia_forestry as mpf
+
+test insert_and_check_root() {
+  let proof: Proof = [Branch { skip: 0, neighbors: #"aa" },]
+  let trie = mpf.insert(mpf.empty, #"ab", #"cd", proof)
+  mpf.root(trie) == #"ef"
+
+}

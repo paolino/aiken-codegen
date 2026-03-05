@@ -1,0 +1,14 @@
+// Auto-generated
+use aiken/merkle_patricia_forestry.{Proof}
+use aiken/merkle_patricia_forestry as mpf
+
+test test_one() {
+  1 == 1
+
+}
+
+test test_two() {
+  let proof: Proof = []
+  mpf.has(mpf.empty, #"ab", #"cd", proof)
+
+}

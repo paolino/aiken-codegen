@@ -1,0 +1,4 @@
+test _() {
+  mpf.insert(t, #"ab", #"cd", p)
+
+}

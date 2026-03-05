@@ -1,0 +1,5 @@
+test _() {
+  let proof: Proof = []
+  proof
+
+}

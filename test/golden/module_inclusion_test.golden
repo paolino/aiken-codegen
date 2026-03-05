@@ -1,0 +1,8 @@
+use aiken/merkle_patricia_forestry.{Proof}
+use aiken/merkle_patricia_forestry as mpf
+
+test has_key() {
+  let proof: Proof = []
+  mpf.has(mpf.empty, #"ab", #"cd", proof)
+
+}

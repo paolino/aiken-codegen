@@ -1,0 +1,4 @@
+test _() {
+  Fork { skip: 0, neighbor: Neighbor { nibble: 5, root: #"dead" } }
+
+}
